@@ -18,7 +18,7 @@ class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
       port 5566
       severity err
       tag minitest
-      debug_output true
+      # debug_output true
     ]
 
     d.run do
@@ -47,7 +47,7 @@ class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
       host example.com
       port 5566
       severity info
-      debug_output true
+      # debug_output true
       tag rewrited.${tag_parts[1]}
     ]
 
@@ -62,13 +62,35 @@ class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
     assert_equal "rewrited.kern", p.tag
   end
 
+  def test_long_tag
+    d = create_driver %[
+      type remote_syslog-5424
+      hostname foo.com
+      host example.com
+      port 5566
+      severity info
+      # debug_output true
+      tag 012345678901234567890123456789012345678901234567890123456789
+    ]
+
+    d.run do
+      d.emit(message: "test_long_tag")
+    end
+
+    loggers = d.instance.instance_variable_get(:@loggers)
+    logger = loggers.values.first
+
+    p = logger.instance_variable_get(:@packet)
+    assert_equal "012345678901234567890123456789012345678901234567", p.tag
+  end
+
   def test_parse_tag
     d = create_driver %[
       type remote_syslog-5424
       hostname foo.com
       host example.com
       port 5566
-      debug_output true
+      # debug_output true
       parse_tag true
       tag ${tag}
     ]

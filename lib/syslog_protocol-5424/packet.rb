@@ -49,14 +49,14 @@ module SyslogProtocol5424
       unless t && t.is_a?(String) && t.length > 0
         raise ArgumentError, "Tag must not be omitted"
       end
-      if t.length > 32
-        raise ArgumentError, "Tag must not be longer than 32 characters"
-      end
       if t =~ /\s/
         raise ArgumentError, "Tag may not contain spaces"
       end
       if t =~ /[^\x21-\x7E]/
         raise ArgumentError, "Tag may only contain ASCII characters 33-126"
+      end
+      if t.length > 48   # don't raise error, instead shrink tag to 48 characters
+        t = t[0,48]
       end
 
       @tag = t
