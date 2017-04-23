@@ -20,6 +20,7 @@ module Fluent
     config_param :severity, :string, :default => "notice"
     config_param :tag, :string, :default => "fluentd"
 
+    config_param :protocol, :string, :default => "udp"
     config_param :parse_tag, :bool, :default => false
     config_param :output_include_time, :bool, :default => false
     config_param :output_include_tag, :bool, :default => false
@@ -58,7 +59,8 @@ module Fluent
           program  = tag
         end
 
-        @loggers[tag] ||= RemoteSyslogSender::UdpSender.new(@host, @port,
+        @loggers[tag] ||= RemoteSyslogSender::Sender.new(@host, @port,
+          protocol: @protocol,
           facility: facility,
           severity: severity,
           program: program,

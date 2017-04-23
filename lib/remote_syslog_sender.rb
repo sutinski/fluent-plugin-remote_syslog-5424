@@ -4,13 +4,24 @@ require 'syslog_protocol-5424'
 module RemoteSyslogSender
   VERSION = '0.1.0'
 
-  class UdpSender
+  class Sender
     def initialize(remote_hostname, remote_port, options = {})
       @remote_hostname = remote_hostname
       @remote_port     = remote_port
       @whinyerrors     = options[:whinyerrors]
+      @protocol        = options[:protocol] || 'tcp'
       
-      @socket = UDPSocket.new
+      if @protocol == 'tcp'
+        begin
+          @socket = TCPSocket.new(@remote_hostname, @remote_port)
+        rescue
+          $stderr.puts "#{self.class} error: #{$!.class}: #{$!}\nSyslog forwarding disabled!"
+          @socket = open('/dev/null', 'w')
+        end
+      else
+        @socket = UDPSocket.new
+      end
+
       @packet = SyslogProtocol5424::Packet.new
 
       local_hostname   = options[:local_hostname] || (Socket.gethostname rescue `hostname`.chomp)
@@ -30,9 +41,13 @@ module RemoteSyslogSender
           packet = @packet.dup
           packet.content = line
           packet.time = time
-          data = packet.assemble
+          data = packet.assemble(65500)  # max_size for UDP
           puts(data) if @debug
-          @socket.send(data, 0, @remote_hostname, @remote_port)
+          if @protocol == 'tcp'
+            @socket.puts(data)
+          else
+            @socket.send(data, 0, @remote_hostname, @remote_port)
+          end
         rescue
           $stderr.puts "#{self.class} error: #{$!.class}: #{$!}\nOriginal message: #{line}"
           raise if @whinyerrors

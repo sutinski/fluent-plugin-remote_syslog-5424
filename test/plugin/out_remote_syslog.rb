@@ -1,5 +1,5 @@
 require "test_helper"
-require "fluent/plugin/out_remote_syslog"
+require "fluent/plugin/out_remote_syslog-5424"
 
 class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
   def setup
@@ -16,6 +16,7 @@ class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
       hostname foo.com
       host example.com
       port 5566
+      protocol tcp
       severity err
       tag minitest
       # debug_output true
