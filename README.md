@@ -15,6 +15,7 @@
   type remote_syslog-5424
   host example.com
   port 514
+  protocol tcp    # optional, defaults to udp
   severity debug
   tag ${tag}
   parse_tag true

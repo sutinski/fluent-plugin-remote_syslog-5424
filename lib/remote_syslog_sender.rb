@@ -9,7 +9,7 @@ module RemoteSyslogSender
       @remote_hostname = remote_hostname
       @remote_port     = remote_port
       @whinyerrors     = options[:whinyerrors]
-      @protocol        = options[:protocol] || 'tcp'
+      @protocol        = options[:protocol] || 'udp'
       
       if @protocol == 'tcp'
         begin
