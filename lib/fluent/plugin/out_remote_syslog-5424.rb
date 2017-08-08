@@ -40,16 +40,17 @@ module Fluent
     def emit(tag, es, chain)
       chain.next
       es.each do |time, record|
+	host_name = @hostname
         record.each_pair do |k, v|
           if v.is_a?(String)
             v.force_encoding("utf-8")
           end
-		  if k=="hostname"
-		    @hostname = v
-		  end
+          if k=="hostname"
+            host_name = v
+	  end
         end
 		
-		record.tap{ |h| h.delete("hostname") }
+        record.tap{ |h| h.delete("hostname") }
 
         tag = rewrite_tag!(tag.dup)
 
@@ -69,7 +70,7 @@ module Fluent
           facility: facility,
           severity: severity,
           program: program,
-          local_hostname: @hostname,
+          local_hostname: host_name,
           debug: @debug_output)
 
         @loggers[tag].transmit format(tag, time, record), Time.at(time)
