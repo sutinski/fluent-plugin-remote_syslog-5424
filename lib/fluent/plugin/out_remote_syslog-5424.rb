@@ -44,7 +44,12 @@ module Fluent
           if v.is_a?(String)
             v.force_encoding("utf-8")
           end
+		  if k=="hostname"
+		    @hostname = v
+		  end
         end
+		
+		record.tap{ |h| h.delete("hostname") }
 
         tag = rewrite_tag!(tag.dup)
 
