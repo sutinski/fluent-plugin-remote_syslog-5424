@@ -44,7 +44,16 @@ module RemoteSyslogSender
           data = packet.assemble(65500)  # max_size for UDP
           puts(data) if @debug
           if @protocol == 'tcp'
-            @socket.puts(data)
+            retry_cnt = 0
+            begin
+              if retry_cnt < 3           # retry 3 times
+                @socket.puts(data)
+              end
+            rescue                       # try to reopen socket
+              @socket = TCPSocket.new(@remote_hostname, @remote_port)
+              retry_cnt += 1
+              retry
+            end
           else
             @socket.send(data, 0, @remote_hostname, @remote_port)
           end

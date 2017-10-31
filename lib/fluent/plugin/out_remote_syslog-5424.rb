@@ -40,14 +40,14 @@ module Fluent
     def emit(tag, es, chain)
       chain.next
       es.each do |time, record|
-	host_name = @hostname
+	      host_name = @hostname
         record.each_pair do |k, v|
           if v.is_a?(String)
             v.force_encoding("utf-8")
           end
           if k=="hostname"
             host_name = v
-	  end
+	        end
         end
 		
         record.tap{ |h| h.delete("hostname") }
