@@ -2,7 +2,7 @@ require 'socket'
 require 'syslog_protocol-5424'
 
 module RemoteSyslogSender
-  VERSION = '0.1.0'
+  VERSION = '0.1.2'
 
   class Sender
     def initialize(remote_hostname, remote_port, options = {})
@@ -15,7 +15,7 @@ module RemoteSyslogSender
         begin
           @socket = TCPSocket.new(@remote_hostname, @remote_port)
         rescue
-          $stderr.puts "#{self.class} error: #{$!.class}: #{$!}\nSyslog forwarding disabled!"
+          $log.ERROR("#{self.class} error: #{$!.class}: #{$!} - Syslog forwarding disabled!")
           @socket = open('/dev/null', 'w')
         end
       else
@@ -58,7 +58,7 @@ module RemoteSyslogSender
             @socket.send(data, 0, @remote_hostname, @remote_port)
           end
         rescue
-          $stderr.puts "#{self.class} error: #{$!.class}: #{$!}\nOriginal message: #{line}"
+          $log.WARN("#{self.class} error: #{$!.class}: #{$!} - Original message: #{line}")
           raise if @whinyerrors
         end
       end

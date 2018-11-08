@@ -47,7 +47,7 @@ module Fluent
           end
           if k=="hostname"
             host_name = v
-	        end
+          end
         end
 		
         record.tap{ |h| h.delete("hostname") }

@@ -1,7 +1,7 @@
 require "test_helper"
 require "fluent/plugin/out_remote_syslog-5424"
 
-class RemoteSyslogOutputTest < MiniTest::Unit::TestCase
+class RemoteSyslogOutputTest < MiniTest::Test
   def setup
     Fluent::Test.setup
   end
